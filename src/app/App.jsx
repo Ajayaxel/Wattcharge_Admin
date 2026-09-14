@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { 
   Users, 
   Zap, 
@@ -25,13 +26,70 @@ import {
   setUserSearchQuery 
 } from '../features/dashboard/dashboardSlice';
 import AppRoutes from './routes';
+import FleetLoginPage from '../features/fleet/pages/FleetLoginPage';
+import FleetDashboardPage from '../features/fleet/pages/FleetDashboardPage';
+import FleetMembersPage from '../features/fleet/pages/FleetMembersPage';
+import FleetCodesPage from '../features/fleet/pages/FleetCodesPage';
+import FleetProfilePage from '../features/fleet/pages/FleetProfilePage';
+import FleetSettingsPage from '../features/fleet/pages/FleetSettingsPage';
+import FleetAnalyticsPage from '../features/fleet/pages/FleetAnalyticsPage';
+import FleetInvitePage from '../features/fleet/pages/FleetInvitePage';
+import FleetLayout from '../features/fleet/FleetLayout';
 
 export default function App() {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { isAuthenticated, isDemoMode } = useSelector((state) => state.auth);
+  const { isAuthenticated: isFleetAuthenticated } = useSelector((state) => state.fleetAuth);
   const { toast, userSearchQuery } = useSelector((state) => state.dashboard);
 
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  // ── Fleet Portal routes ── render /fleet/* completely separately
+  if (location.pathname.startsWith('/fleet')) {
+    return (
+      <Routes>
+        <Route path="/fleet/login" element={<FleetLoginPage />} />
+        <Route
+          path="/fleet/dashboard"
+          element={
+            isFleetAuthenticated
+              ? <FleetLayout><FleetDashboardPage /></FleetLayout>
+              : <Navigate to="/fleet/login" replace />
+          }
+        />
+        <Route
+          path="/fleet/members"
+          element={isFleetAuthenticated ? <FleetLayout><FleetMembersPage /></FleetLayout> : <Navigate to="/fleet/login" replace />}
+        />
+        <Route
+          path="/fleet/codes"
+          element={isFleetAuthenticated ? <FleetLayout><FleetCodesPage /></FleetLayout> : <Navigate to="/fleet/login" replace />}
+        />
+        <Route
+          path="/fleet/analytics"
+          element={isFleetAuthenticated ? <FleetLayout><FleetAnalyticsPage /></FleetLayout> : <Navigate to="/fleet/login" replace />}
+        />
+        <Route
+          path="/fleet/invite"
+          element={isFleetAuthenticated ? <FleetLayout><FleetInvitePage /></FleetLayout> : <Navigate to="/fleet/login" replace />}
+        />
+        <Route
+          path="/fleet/profile"
+          element={isFleetAuthenticated ? <FleetLayout><FleetProfilePage /></FleetLayout> : <Navigate to="/fleet/login" replace />}
+        />
+        <Route
+          path="/fleet/settings"
+          element={isFleetAuthenticated ? <FleetLayout><FleetSettingsPage /></FleetLayout> : <Navigate to="/fleet/login" replace />}
+        />
+        {/* Catch-all → dashboard or login */}
+        <Route
+          path="/fleet/*"
+          element={<Navigate to={isFleetAuthenticated ? '/fleet/dashboard' : '/fleet/login'} replace />}
+        />
+      </Routes>
+    );
+  }
 
   // Automatically clear toast notifications
   useEffect(() => {

@@ -11,12 +11,13 @@ export default function Modal({
   title,
   icon: Icon,
   children,
+  maxWidthClass = 'max-w-lg',
 }) {
   if (!show) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-appCard border border-white/5 rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <div className={`w-full ${maxWidthClass} bg-appCard border border-white/5 rounded-3xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200`}>
         {/* Modal Header */}
         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/20">
           <div className="flex items-center gap-2">
